@@ -44,23 +44,23 @@ with Diagram(
     with Cluster("System 1: Fast Path", graph_attr=cluster_attr(CLUSTER_COLOURS[0])):
         sense = Custom(
             "Sense",
-            r"E:\Learnings\Extras\3_sem\Hackathon\Diagram-creator\icons\sense.png",
+            "/home/pramit/Diagram-creator/icons/sense.png",
         )
         embed = Custom(
             "Embed",
-            r"E:\Learnings\Extras\3_sem\Hackathon\Diagram-creator\icons\embed.png",
+            "/home/pramit/Diagram-creator/icons/embed.png",
         )
         classify = Custom(
             "Classify",
-            r"E:\Learnings\Extras\3_sem\Hackathon\Diagram-creator\icons\classify.png",
+            "/home/pramit/Diagram-creator/icons/classify.png",
         )
         act = Custom(
             "Act (QoS)",
-            r"E:\Learnings\Extras\3_sem\Hackathon\Diagram-creator\icons\act.png",
+            "/home/pramit/Diagram-creator/icons/act.png",
         )
         provisional = Custom(
             "Provisional QoS",
-            r"E:\Learnings\Extras\3_sem\Hackathon\Diagram-creator\icons\provisional.png",
+            "/home/pramit/Diagram-creator/icons/provisional.png",
         )
 
         # Main path
@@ -81,26 +81,26 @@ with Diagram(
     # INTERFACE: THE GATEKEEPER
     shadowguard = Custom(
         "ShadowGuard Validation",
-        r"E:\Learnings\Extras\3_sem\Hackathon\Diagram-creator\icons\shadowguard.png",
+        "/home/pramit/Diagram-creator/icons/shadowguard.png",
     )
 
     # SYSTEM 2: LEARNING (BOTTOM TRACK)
     with Cluster("System 2: Slow Path", graph_attr=cluster_attr(CLUSTER_COLOURS[1])):
         detect = Custom(
             "Detect Drift",
-            r"E:\Learnings\Extras\3_sem\Hackathon\Diagram-creator\icons\detect.png",
+            "/home/pramit/Diagram-creator/icons/detect.png",
         )
         improve = Custom(
             "Improve Model",
-            r"E:\Learnings\Extras\3_sem\Hackathon\Diagram-creator\icons\train.png",
+            "/home/pramit/Diagram-creator/icons/train.png",
         )
         test = Custom(
             "Test Policy",
-            r"E:\Learnings\Extras\3_sem\Hackathon\Diagram-creator\icons\test.png",
+            "/home/pramit/Diagram-creator/icons/test.png",
         )
         promote = Custom(
             "Promote",
-            r"E:\Learnings\Extras\3_sem\Hackathon\Diagram-creator\icons\promote.png",
+            "/home/pramit/Diagram-creator/icons/promote.png",
         )
 
         # Learning path
