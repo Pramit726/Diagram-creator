@@ -1,0 +1,53 @@
+// Title & Layout
+title Dual Loop Intelligence Evolution
+direction right
+
+// ===============================
+// SYSTEM 1: PRODUCTION (TOP TRACK)
+// ===============================
+// IDs must be alphanumeric; labels handle the special characters
+SystemOne [color: green, label: "System 1: Fast Path"] {
+  SenseNode [icon: rss, label: "Sense"]
+  EmbedNode [icon: box, label: "Embed"]
+  DecisionNode [shape: diamond, label: "Classify"]
+  ActNode [icon: play-circle, label: "Act (QoS)"]
+}
+
+SenseNode > EmbedNode > DecisionNode
+DecisionNode > ActNode [label: "Known"]
+
+// Fallback Branch
+UnknownNode [color: red, icon: alert-circle, label: "Provisional QoS"]
+DecisionNode > UnknownNode [style: dashed, label: "Unknown"]
+
+// ===============================
+// INTERFACE: THE GATEKEEPER
+// ===============================
+ShadowGuardNode [color: blue, icon: shield, label: "ShadowGuard Validation"]
+
+// ===============================
+// SYSTEM 2: LEARNING (BOTTOM TRACK)
+// ===============================
+SystemTwo [color: blue, label: "System 2: Slow Path"] {
+  DetectNode [icon: activity, label: "Detect Drift"]
+  TrainNode [icon: layers, label: "Improve Model"]
+  TestNode [icon: clipboard, label: "Test Policy"]
+  PromoteNode [icon: trending-up, label: "Promote"]
+}
+
+DetectNode > TrainNode > TestNode > PromoteNode
+
+// ===============================
+// CROSS-LOOP LOGIC
+// ===============================
+
+// Trigger learning from unknowns
+UnknownNode > DetectNode [label: "Trigger"]
+
+// Safety Promotion Loop
+PromoteNode > ShadowGuardNode
+ShadowGuardNode > DecisionNode [style: dashed, label: "Update"]
+
+// Feedback from Act to improve
+ActNode > ShadowGuardNode [label: "KPIs"]
+ShadowGuardNode > DetectNode [style: dashed]

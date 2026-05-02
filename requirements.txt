@@ -1,0 +1,21 @@
+# Eraser.io → Hackathon Diagram Generator
+# =========================================
+# IMPORTANT: Install GraphViz system-wide FIRST
+#   Windows → https://graphviz.org/download/ (tick "Add to PATH")
+#   macOS   → brew install graphviz
+#   Ubuntu  → sudo apt install graphviz
+#
+# Then on Windows, install pygraphviz with C-extension flags:
+#   pip install --config-settings="--global-option=build_ext" ^
+#       --config-settings="--global-option=-IC:\Program Files\Graphviz\include" ^
+#       --config-settings="--global-option=-LC:\Program Files\Graphviz\lib" pygraphviz
+#
+# Then install the rest:
+#   pip install -r requirements.txt
+
+diagrams==0.24.4
+graphviz==0.20.3
+pygraphviz==1.14
+graphviz2drawio==1.1.0
+puremagic==1.30
+svg.path==7.0
