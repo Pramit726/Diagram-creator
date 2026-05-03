@@ -1,8 +1,7 @@
 from diagrams import Diagram, Cluster, Edge
 from diagrams.custom import Custom
-from diagrams.onprem.mlops import Mlflow
 
-# Graph attributes for hackathon-quality output
+# Graph attributes
 graph_attr = {
     "splines": "ortho",
     "pad": "0.5",
@@ -14,12 +13,9 @@ graph_attr = {
     "compound": "true",
 }
 
-# Cluster colour palette
 CLUSTER_COLOURS = [
-    "#E3F2FD",  # ice blue
-    "#F3E5F5",  # lavender
-    "#E8F5E9",  # mint
-    "#FFFDE7",  # yellow
+    "#E3F2FD",
+    "#F3E5F5",
 ]
 
 
@@ -40,97 +36,129 @@ with Diagram(
     outformat=["png", "dot"],
     graph_attr=graph_attr,
 ):
-    # SYSTEM 1: PRODUCTION (TOP TRACK)
-    with Cluster("System 1: Fast Path", graph_attr=cluster_attr(CLUSTER_COLOURS[0])):
-        sense = Custom(
-            "Sense",
-            "/home/pramit/Diagram-creator/icons/sense.png",
-        )
-        embed = Custom(
-            "Embed",
-            "/home/pramit/Diagram-creator/icons/embed.png",
-        )
-        classify = Custom(
-            "Classify",
-            "/home/pramit/Diagram-creator/icons/classify.png",
-        )
-        act = Custom(
-            "Act (QoS)",
-            "/home/pramit/Diagram-creator/icons/act.png",
-        )
+
+    # ---------------- SYSTEM 1 ----------------
+    with Cluster(
+        "System 1: Fast Path (<45 ms)", graph_attr=cluster_attr(CLUSTER_COLOURS[0])
+    ):
+
+        sense = Custom("Sense", "/home/pramit/Diagram-creator/icons/sense.png")
+        embed = Custom("Embed", "/home/pramit/Diagram-creator/icons/embed.png")
+        classify = Custom("Classify", "/home/pramit/Diagram-creator/icons/classify.png")
+        act = Custom("Act (QoS)", "/home/pramit/Diagram-creator/icons/act.png")
+
+        # 🔥 FIX 5: Add "No SLA drop" messaging
         provisional = Custom(
-            "Provisional QoS",
+            "Provisional QoS\n(Safe fallback — No SLA drop)",
             "/home/pramit/Diagram-creator/icons/provisional.png",
         )
 
-        # Main path
-        (
-            sense
-            >> Edge(color="#2196F3", fontsize="11")
-            >> embed
-            >> Edge(color="#2196F3", fontsize="11")
-            >> classify
-        )
-        classify >> Edge(label="Known", color="#2196F3", fontsize="11") >> act
+        # Main flow
+        sense >> Edge(color="#2196F3") >> embed >> Edge(color="#2196F3") >> classify
+
+        classify >> Edge(label="Known", color="#2196F3") >> act
+
         (
             classify
-            >> Edge(label="Unknown", color="#607D8B", style="dashed", fontsize="11")
+            >> Edge(
+                label="Unknown",
+                color="#607D8B",
+                style="dashed",
+            )
             >> provisional
         )
 
-    # INTERFACE: THE GATEKEEPER
+    # ---------------- SHADOWGUARD ----------------
+    # 🔥 FIX 3: Make role explicit
     shadowguard = Custom(
-        "ShadowGuard Validation",
+        "ShadowGuard\n(Tests before deployment\n2% traffic • promote only if better)",
         "/home/pramit/Diagram-creator/icons/shadowguard.png",
     )
 
-    # SYSTEM 2: LEARNING (BOTTOM TRACK)
-    with Cluster("System 2: Slow Path", graph_attr=cluster_attr(CLUSTER_COLOURS[1])):
-        detect = Custom(
-            "Detect Drift",
-            "/home/pramit/Diagram-creator/icons/detect.png",
-        )
-        improve = Custom(
-            "Improve Model",
-            "/home/pramit/Diagram-creator/icons/train.png",
-        )
-        test = Custom(
-            "Test Policy",
-            "/home/pramit/Diagram-creator/icons/test.png",
-        )
-        promote = Custom(
-            "Promote",
-            "/home/pramit/Diagram-creator/icons/promote.png",
-        )
+    # ---------------- SYSTEM 2 ----------------
+    with Cluster(
+        "System 2: Slow Path (Learning Loop)",
+        graph_attr=cluster_attr(CLUSTER_COLOURS[1]),
+    ):
 
-        # Learning path
+        detect = Custom("Detect Drift", "/home/pramit/Diagram-creator/icons/detect.png")
+        improve = Custom(
+            "Improve Model", "/home/pramit/Diagram-creator/icons/train.png"
+        )
+        test = Custom("Test Policy", "/home/pramit/Diagram-creator/icons/test.png")
+        promote = Custom("Promote", "/home/pramit/Diagram-creator/icons/promote.png")
+
+        # Forward learning flow
         (
             detect
-            >> Edge(color="#2196F3", fontsize="11")
+            >> Edge(color="#9C27B0")
             >> improve
-            >> Edge(color="#2196F3", fontsize="11")
+            >> Edge(color="#9C27B0")
             >> test
-            >> Edge(color="#2196F3", fontsize="11")
+            >> Edge(color="#9C27B0")
             >> promote
         )
 
-    # CROSS-LOOP LOGIC
-    # Trigger learning from unknowns
-    provisional >> Edge(label="Trigger", color="#2196F3", fontsize="11") >> detect
+        # 🔥 FIX 4: Add cyclic loop
+        (
+            promote
+            >> Edge(
+                label="Continuous monitoring",
+                color="#9C27B0",
+                style="dashed",
+            )
+            >> detect
+        )
 
-    # Safety Promotion Loop
-    promote >> Edge(color="#2196F3", fontsize="11") >> shadowguard
+    # ---------------- CROSS LOOP ----------------
+
+    # 🔥 FIX 1: Strong UNKNOWN trigger
+    (
+        provisional
+        >> Edge(
+            label="Trigger learning loop",
+            color="#FF9800",
+            penwidth="2",
+        )
+        >> detect
+    )
+
+    # 🔥 FIX 2: KPI → Reward signal (VERY IMPORTANT)
+    (
+        act
+        >> Edge(
+            label="Real-world reward\n(RTT, latency, QoS KPIs)",
+            color="#4CAF50",
+            penwidth="2",
+        )
+        >> shadowguard
+    )
+
+    # Safety gate
+    promote >> Edge(color="#2196F3") >> shadowguard
+
     (
         shadowguard
-        >> Edge(label="Update", color="#607D8B", style="dashed", fontsize="11")
+        >> Edge(
+            label="Update model & policy",
+            style="dashed",
+            color="#607D8B",
+        )
         >> classify
     )
 
-    # Feedback from Act to improve
-    act >> Edge(label="KPIs", color="#2196F3", fontsize="11") >> shadowguard
-    shadowguard >> Edge(color="#607D8B", style="dashed", fontsize="11") >> detect
+    # Feedback into learning
+    (
+        shadowguard
+        >> Edge(
+            style="dashed",
+            color="#607D8B",
+        )
+        >> detect
+    )
 
-# draw.io export
+
+# Optional: draw.io export
 import subprocess
 
 try:
