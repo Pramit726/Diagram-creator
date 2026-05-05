@@ -1,53 +1,92 @@
 // Title & Layout
-title Dual Loop Intelligence Evolution
-direction right
+title Hybrid Classifier + OpenSense
+direction down
+
 
 // ===============================
-// SYSTEM 1: PRODUCTION (TOP TRACK)
+// INPUT
 // ===============================
-// IDs must be alphanumeric; labels handle the special characters
-SystemOne [color: green, label: "System 1: Fast Path"] {
-  SenseNode [icon: rss, label: "Sense"]
-  EmbedNode [icon: box, label: "Embed"]
-  DecisionNode [shape: diamond, label: "Classify"]
-  ActNode [icon: play-circle, label: "Act (QoS)"]
+Embedding [icon: database, label: "Traffic Embedding (z)"]
+
+
+// ===============================
+// HYBRID CLASSIFIER
+// ===============================
+Hybrid [color: blue, icon: cpu, label: "Hybrid Classifier"] {
+
+  Similarity [label: "Similarity (Memory Bank)"]
+  ML [label: "ML Confidence"]
+  OOD [label: "OOD Detection"]
 }
 
-SenseNode > EmbedNode > DecisionNode
-DecisionNode > ActNode [label: "Known"]
+// Parallel signals
+Embedding > Similarity
+Embedding > ML
+Embedding > OOD
 
-// Fallback Branch
-UnknownNode [color: red, icon: alert-circle, label: "Provisional QoS"]
-DecisionNode > UnknownNode [style: dashed, label: "Unknown"]
-
-// ===============================
-// INTERFACE: THE GATEKEEPER
-// ===============================
-ShadowGuardNode [color: blue, icon: shield, label: "ShadowGuard Validation"]
 
 // ===============================
-// SYSTEM 2: LEARNING (BOTTOM TRACK)
+// DECISION (IMPLICIT)
 // ===============================
-SystemTwo [color: blue, label: "System 2: Slow Path"] {
-  DetectNode [icon: activity, label: "Detect Drift"]
-  TrainNode [icon: layers, label: "Improve Model"]
-  TestNode [icon: clipboard, label: "Test Policy"]
-  PromoteNode [icon: trending-up, label: "Promote"]
+Known [color: green, icon: check-circle, label: "Known Traffic"]
+Unknown [color: orange, icon: alert-circle, label: "Unknown Traffic"]
+
+Similarity > Known: high similarity
+ML > Known: high confidence
+OOD --> Unknown: low confidence / OOD
+
+
+// ===============================
+// FAST PATH (KNOWN)
+// ===============================
+QoS [icon: sliders, label: "Apply QoS"]
+
+Known > QoS
+
+
+// ===============================
+// UNKNOWN HANDLING
+// ===============================
+Provisional QoS [color: gray, icon: activity, label: "Provisional QoS"]
+
+
+
+// ===============================
+// OPENSENSE (LEARNING)
+// ===============================
+OpenSense [color: orange, icon: search, label: "OpenSense"] {
+
+  Cluster [label: "Cluster unknowns (HDBSCAN)"]
+  Validate [label: "Stable cluster?"]
 }
 
-DetectNode > TrainNode > TestNode > PromoteNode
+Unknown > Cluster
+Cluster > Validate
+
 
 // ===============================
-// CROSS-LOOP LOGIC
+// EVOLUTION
 // ===============================
+New Class [color: purple, icon: plus-circle, label: "New Class + Policy"]
 
-// Trigger learning from unknowns
-UnknownNode > DetectNode [label: "Trigger"]
+Validate > New Class: YES
+Validate --> Cluster: NO
 
-// Safety Promotion Loop
-PromoteNode > ShadowGuardNode
-ShadowGuardNode > DecisionNode [style: dashed, label: "Update"]
 
-// Feedback from Act to improve
-ActNode > ShadowGuardNode [label: "KPIs"]
-ShadowGuardNode > DetectNode [style: dashed]
+// ===============================
+// OUTPUT
+// ===============================
+New Class > QoS
+
+
+// ===============================
+// LEGEND
+// ===============================
+legend {
+  >   : Primary flow
+  --> : Uncertain / feedback loop
+  blue: Decision layer
+  orange: Learning layer
+  green: Known path
+  purple: New class creation
+}
